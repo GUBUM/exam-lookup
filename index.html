@@ -77,8 +77,11 @@
   <div class="container">
     <h2>수험생 정보 조회</h2>
 
-    <label>휴대폰 번호 (예: 01093666516)</label>
-    <input type="text" id="phone" placeholder="숫자만 입력해주세요">
+    <label>이름</label>
+    <input type="text" id="name" placeholder="예: 김주담">
+
+    <label>휴대폰 번호 (숫자만 입력)</label>
+    <input type="text" id="phone" placeholder="예: 01093666516">
 
     <button onclick="search()">조회</button>
 
@@ -93,19 +96,21 @@
       .then(data => db = data);
 
     function search() {
+      const name = document.getElementById("name").value.trim();
       const phone = document.getElementById("phone").value.trim();
       const resultDiv = document.getElementById("result");
 
-      if (!phone || phone.length < 10) {
-        resultDiv.innerHTML = "<p>📱 올바른 휴대폰 번호를 입력해주세요.</p>";
+      if (!name || !phone) {
+        resultDiv.innerHTML = "<p>⚠️ 이름과 휴대폰 번호를 모두 입력해주세요.</p>";
         return;
       }
 
-      const found = db.find(item => item.phone === phone);
+      const found = db.find(item =>
+        item.name === name && item.phone === phone
+      );
 
       if (found) {
         resultDiv.innerHTML = `
-          <p><strong>이름:</strong> ${found.name}</p>
           <p><strong>수험번호:</strong> ${found.id}</p>
           <p><strong>생월일:</strong> ${found.birth}</p>
           <p><strong>고사장:</strong> ${found.location}</p>
@@ -114,7 +119,7 @@
           <p><strong>좌석번호:</strong> ${found.seat}</p>
         `;
       } else {
-        resultDiv.innerHTML = "<p>😥 일치하는 수험생 정보를 찾을 수 없습니다.</p>";
+        resultDiv.innerHTML = "<p>😥 입력하신 정보와 일치하는 수험생을 찾을 수 없습니다.</p>";
       }
     }
   </script>
