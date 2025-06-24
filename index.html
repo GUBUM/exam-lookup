@@ -153,13 +153,14 @@
       .then(data => db = data);
 
     function renderSeatMap(targetSeat) {
+      // 전체 좌석 영역 wrapper
       const seatMapDiv = document.createElement('div');
 
-      // 칠판 박스 추가
+      // 칠판 박스
       const boardDiv = document.createElement('div');
       boardDiv.className = 'board';
       boardDiv.innerText = '칠판';
-      seatMapDiv.appendChild(boardDiv);
+      seatMapDiv.appendChild(boardDiv);  // 이제 seatMapDiv가 있으니 여기 추가 가능
 
       // 좌석표 그리드
       const gridDiv = document.createElement('div');
@@ -178,10 +179,9 @@
         }
       }
 
-      seatMapDiv.appendChild(gridDiv);
+      seatMapDiv.appendChild(gridDiv);  // 칠판 아래에 좌석배치 추가
       return seatMapDiv;
     }
-
 
     function search() {
       const name = document.getElementById("name").value.trim();
