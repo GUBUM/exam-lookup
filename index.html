@@ -13,7 +13,7 @@
       display: flex;
       justify-content: center;
       align-items: flex-start;
-      min-height: 100vh;
+      min-height: 100vh;   
     }
 
     .container {
@@ -130,28 +130,79 @@
   </style>
 </head>
 <body>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDHrX59Ymvg6XW5_YtALwtYv6E_PZ7nafI",
+      authDomain: "exam-lookup.firebaseapp.com",
+      projectId: "exam-lookup",
+      storageBucket: "exam-lookup.firebasestorage.app",
+      messagingSenderId: "1023962181020",
+      appId: "1:1023962181020:web:1ba218378e51a6978f2c59"
+    };
+
+    // 검색 함수 바깥으로 꺼내기
+    window.search = async function () {
+      const name = document.getElementById("name").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const resultDiv = document.getElementById("result");
+
+      if (!name || !phone) {
+        resultDiv.innerHTML = "<p>⚠️ 이름과 휴대폰 번호를 모두 입력해주세요.</p>";
+        return;
+      }
+
+      resultDiv.innerHTML = "조회 중입니다...";
+
+      try {
+        const q = query(
+          collection(db, "users"),
+          where("name", "==", name),
+          where("phone", "==", phone)
+        );
+
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+          resultDiv.innerHTML = "<p>😥 입력하신 정보와 일치하는 수험생을 찾을 수 없습니다.</p>";
+        } else {
+          querySnapshot.forEach(doc => {
+            const found = doc.data();
+            resultDiv.innerHTML = `
+              <p>
+                ${found.name} 님의 시험 장소는 <strong>${found.location}</strong> <strong>${found.floor}</strong>층 <strong>${found.room}</strong>고사실이며, 좌석번호는 <strong>${found.seat}번</strong>입니다.
+              </p>
+            `;
+            const seatMap = renderSeatMap(Number(found.seat), Number(found.room));
+            resultDiv.appendChild(seatMap);
+          });
+        }
+      } catch (error) {
+        console.error("Firestore 조회 오류:", error);
+        resultDiv.innerHTML = "<p>❌ 오류가 발생했습니다. 다시 시도해주세요.</p>";
+      }
+    };
+  </script>
+
   <div class="container">
     <h2>고사실 정보</h2>
     <p style="text-align: center; margin-top: -12px; margin-bottom: 24px; color: #555; font-size: 0.95rem;">
-      이름과 휴대폰 번호를 입력하면<br><Strong style="color: #1976d2;">고사장과 좌석 정보를 확인</Strong>할 수 있습니다.
+      이름과 휴대폰 번호를 입력하면<br><strong style="color: #1976d2;">고사장과 좌석 정보를 확인</strong>할 수 있습니다.
     </p>
     <label for="name">이름</label>
     <input type="text" id="name" placeholder="예: 홍길동">
 
     <label for="phone">휴대폰 번호 (숫자만)</label>
-    <input type="text" id="phone" placeholder="예: 01012345678">
+    <input type="tel" id="phone" placeholder="예: 01012345678">
 
     <button onclick="search()">조회</button>
 
     <div id="result"></div>
   </div>
 
-  <script>
-    let db = [];
-
-    fetch('data.json')
-      .then(res => res.json())
-      .then(data => db = data);
+  <script>    
 
     function renderSeatMap(targetSeat, roomNumber) {
       const seatMapDiv = document.createElement('div');
@@ -218,33 +269,6 @@
 
       seatMapDiv.appendChild(gridDiv);
       return seatMapDiv;
-    }
-
-    function search() {
-      const name = document.getElementById("name").value.trim();
-      const phone = document.getElementById("phone").value.trim();
-      const resultDiv = document.getElementById("result");
-
-      if (!name || !phone) {
-        resultDiv.innerHTML = "<p>⚠️ 이름과 휴대폰 번호를 모두 입력해주세요.</p>";
-        return;
-      }
-
-      const found = db.find(item =>
-        item.name === name && item.phone === phone
-      );
-
-      if (found) {
-        resultDiv.innerHTML = ` 
-          <p>
-            ${found.name} 님의 시험 장소는 <strong>${found.location}</strong> <strong>${found.floor}</strong>층 <strong>${found.room}</strong>고사실 이며, 좌석번호는 <strong>${found.seat}번</strong>입니다.
-          </p>
-        `;
-        const seatMap = renderSeatMap(Number(found.seat), Number(found.room));
-        resultDiv.appendChild(seatMap);
-      } else {
-        resultDiv.innerHTML = "<p>😥 입력하신 정보와 일치하는 수험생을 찾을 수 없습니다.</p>";
-      }
     }
   </script>
 </body>
