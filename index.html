@@ -202,17 +202,15 @@
       // 최종 출력
       for (let col = 0; col < 5; col++) {
         for (let row = 0; row < 5; row++) {
+          const number = seats[row][col];
           const seatDiv = document.createElement('div');
           seatDiv.className = 'seat';
-
-          const number = seats[row][col];
           if (number !== "") {
             seatDiv.innerText = number;
-            if (number === targetSeat) {
+            if (Number(number) === targetSeat) {
               seatDiv.classList.add('selected');
             }
           }
-
           gridDiv.appendChild(seatDiv);
         }
       }
