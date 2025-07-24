@@ -250,10 +250,13 @@
       }
 
       try {
-        const snapshot = await db.collection("users")
-          .where("name", "==", name)
-          .where("phone", "==", phone)
-          .get();
+        const q = query(
+          collection(db, "users"),
+          where("name", "==", name),
+          where("phone", "==", phone)
+        );
+
+        const snapshot = await getDocs(q);
 
         if (snapshot.empty) {
           resultDiv.innerHTML = "<p>😥 입력하신 정보와 일치하는 수험생을 찾을 수 없습니다.</p>";
