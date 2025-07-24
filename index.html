@@ -134,25 +134,6 @@
   </style>
 </head>
 <body>
-  <script type="module">
-  // Import the functions you need from the SDKs you need
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-    // TODO: Add SDKs for Firebase products that you want to use
-    // https://firebase.google.com/docs/web/setup#available-libraries
-
-    // Your web app's Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyDHrX59Ymvg6XW5_YtALwtYv6E_PZ7nafI",
-      authDomain: "exam-lookup.firebaseapp.com",
-      projectId: "exam-lookup",
-      storageBucket: "exam-lookup.firebasestorage.app",
-      messagingSenderId: "1023962181020",
-      appId: "1:1023962181020:web:1ba218378e51a6978f2c59"
-    };
-
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-  </script>
   <div class="container">
     <h2>고사실 정보</h2>
     <p style="text-align: center; margin-top: -12px; margin-bottom: 24px; color: #555; font-size: 0.95rem;">
@@ -170,12 +151,6 @@
   </div>
 
   <script>
-    let db = [];
-
-    fetch('data.json')
-      .then(res => res.json())
-      .then(data => db = data);
-
     function renderSeatMap(targetSeat, roomNumber) {
       const seatMapDiv = document.createElement('div');
       const boardDiv = document.createElement('div');
@@ -244,6 +219,27 @@
     }
   </script>
   <script>
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+    import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDHrX59Ymvg6XW5_YtALwtYv6E_PZ7nafI",
+      authDomain: "exam-lookup.firebaseapp.com",
+      projectId: "exam-lookup",
+      storageBucket: "exam-lookup.firebasestorage.app",
+      messagingSenderId: "1023962181020",
+      appId: "1:1023962181020:web:1ba218378e51a6978f2c59"
+    };
+
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
     async function search() {
       const name = document.getElementById("name").value.trim();
       const phone = document.getElementById("phone").value.trim();
@@ -255,7 +251,7 @@
       }
 
       try {
-        const snapshot = await db.collection("students")
+        const snapshot = await db.collection("users")
           .where("name", "==", name)
           .where("phone", "==", phone)
           .get();
@@ -268,7 +264,7 @@
         const doc = snapshot.docs[0];
         const found = doc.data();
 
-        resultDiv.innerHTML = ` 
+        resultDiv.innerHTML = `
           <p>
             ${found.name} 님의 시험 장소는 <strong>${found.location}</strong> <strong>${found.floor}</strong>층 <strong>${found.room}</strong>고사실 이며, 좌석번호는 <strong>${found.seat}번</strong>입니다.
           </p>
@@ -281,6 +277,7 @@
         resultDiv.innerHTML = "<p>❌ 오류가 발생했습니다. 다시 시도해주세요.</p>";
       }
     }
+
   </script>
 
 </body>
